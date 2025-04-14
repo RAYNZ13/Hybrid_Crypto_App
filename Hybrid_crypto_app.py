@@ -63,11 +63,11 @@ def fetch_historical_prices(coin_id, days=90):
 # --- Categorization ---
 def get_classification_reason(market_cap):
     if market_cap >= 10e9:
-        return f"because its market cap of **${market_cap:,.0f}** exceeds the $10B threshold for Large Cap."
+        return f"because its market cap of ${market_cap:,.0f} exceeds the $10B threshold for Large Cap."
     elif market_cap >= 1e9:
-        return f"because its market cap of **${market_cap:,.0f}** falls between $1B and $10B, placing it in the Mid Cap category."
+        return f"because its market cap of ${market_cap:,.0f} falls between $1B and $10B, placing it in the Mid Cap category."
     else:
-        return f"because its market cap of **${market_cap:,.0f}** is below $1B, making it a Small Cap coin."
+        return f"because its market cap of ${market_cap:,.0f} is below $1B, making it a Small Cap coin."
 
 
 def predict_category(coin_id):
