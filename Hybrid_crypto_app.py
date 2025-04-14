@@ -61,6 +61,14 @@ def fetch_historical_prices(coin_id, days=90):
         return None
 
 # --- Categorization ---
+def get_classification_reason(market_cap):
+    if market_cap >= 10e9:
+        return f"because its market cap of **${market_cap:,.0f}** exceeds the $10B threshold for Large Cap."
+    elif market_cap >= 1e9:
+        return f"because its market cap of **${market_cap:,.0f}** falls between $1B and $10B, placing it in the Mid Cap category."
+    else:
+        return f"because its market cap of **${market_cap:,.0f}** is below $1B, making it a Small Cap coin."
+
 def predict_category(coin_id):
     data = fetch_crypto_data(coin_id)
     if not data:
@@ -75,10 +83,26 @@ def predict_category(coin_id):
         coin.get("high_24h", 0),
         coin.get("low_24h", 0)
     ]).reshape(1, -1)
+
     features_scaled = scaler.transform(features)
     prediction = xgb_model.predict(features_scaled)[0]
     mapping = {0: "Small Cap", 1: "Mid Cap", 2: "Large Cap"}
-    return f"✅ The cryptocurrency **{coin_id.capitalize()}** is categorized as **{mapping[prediction]}**."
+    category = mapping[prediction]
+
+    reason = get_classification_reason(coin.get("market_cap", 0))
+
+    # Optional: detailed view of coin stats (can remove if not needed)
+    st.markdown("**🔍 Market Data Used:**")
+    st.markdown(f"""
+    - Market Cap: **${coin['market_cap']:,.0f}**
+    - Volume (24h): **${coin['total_volume']:,.0f}**
+    - Circulating Supply: **{coin['circulating_supply']:,.0f}**
+    - Max Supply: **{coin['max_supply'] if coin['max_supply'] else 'Unknown'}**
+    - 24h High: **${coin['high_24h']:,.2f}**
+    - 24h Low: **${coin['low_24h']:,.2f}**
+    """)
+
+    return f"✅ The cryptocurrency **{coin_id.capitalize()}** is categorized as **{category}**, {reason}"
 
 # --- Price Prediction using real historical data ---
 def prepare_lstm_input(price_series, sequence_length=60):
