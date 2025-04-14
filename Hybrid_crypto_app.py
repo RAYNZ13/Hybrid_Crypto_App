@@ -69,6 +69,7 @@ def get_classification_reason(market_cap):
     else:
         return f"because its market cap of **${market_cap:,.0f}** is below $1B, making it a Small Cap coin."
 
+
 def predict_category(coin_id):
     data = fetch_crypto_data(coin_id)
     if not data:
@@ -103,6 +104,7 @@ def predict_category(coin_id):
     """)
 
     return f"✅ The cryptocurrency **{coin_id.capitalize()}** is categorized as **{category}**, {reason}"
+
 
 # --- Price Prediction using real historical data ---
 def prepare_lstm_input(price_series, sequence_length=60):
