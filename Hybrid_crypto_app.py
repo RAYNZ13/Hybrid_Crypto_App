@@ -137,7 +137,34 @@ def predict_price(coin_id):
     ax.set_ylabel("Price (USD)")
     ax.set_title(f"Price Prediction for {coin_id.capitalize()}")
     st.pyplot(fig)
+    
+    # Plot historical prices and predicted price
+    st.subheader("📉 Price Chart")
+    fig, ax = plt.subplots(figsize=(10, 5))
+    df['price'].plot(ax=ax, label='Historical Price', color='blue')
+    future_date = df.index[-1] + pd.Timedelta(days=1)
+    ax.plot(future_date, predicted_price, 'ro', label='Predicted Next Price')
+    ax.legend()
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Price (USD)")
+    ax.set_title(f"Price Prediction for {coin_id.capitalize()}")
+    st.pyplot(fig)
 
+    # ➕ Add LSTM Input Summary
+    st.markdown(f"""
+    **📘 How this prediction was made:**
+
+    - The model used the **past 60 days of daily closing prices** for `{coin_id}`.
+    - Prices were collected in real-time from the **CoinGecko API**.
+    - The prediction is made using a **pre-trained LSTM model** which detects trends in past price movements.
+    - **Note:** The model does *not* consider news, regulations, or macroeconomic events.
+    """)
+
+    # ➕ Show Last 5 Days of Price for Context
+    st.markdown("**🕰 Last 5 Days of Historical Prices:**")
+    st.dataframe(df['price'].tail(5).rename("Closing Price (USD)"))
+
+    # Final result statement
     return f"📈 Predicted future price for **{coin_id.capitalize()}**: **${predicted_price:.2f}**"
 
 # --- User Input ---
