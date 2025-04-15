@@ -129,6 +129,11 @@ def predict_price(coin_id):
     predicted_scaled = lstm_model.predict(last_sequence)[0][0]
     predicted_price = price_scaler.inverse_transform([[predicted_scaled]])[0][0]
 
+    latest_actual_price = df['price'].iloc[-1]
+    diff = predicted_price - latest_actual_price
+    diff_percent = (diff / latest_actual_price) * 100
+    accuracy_comment = "✅ Close to actual" if abs(diff_percent) <= 3 else "⚠️ Noticeable deviation"
+
     st.subheader("📉 Price Chart")
     fig, ax = plt.subplots(figsize=(10, 5))
     df['price'].plot(ax=ax, label='Historical Price', color='blue')
@@ -150,6 +155,14 @@ def predict_price(coin_id):
 
     with st.expander("🕰 Recent Price Trend"):
         st.dataframe(df['price'].tail(5).rename("Closing Price (USD)"))
+
+    st.markdown("""
+    ### 🔍 Prediction vs Actual
+    - 📈 **Predicted Price:** ${:,.2f}
+    - 💰 **Actual Latest Price:** ${:,.2f}
+    - 🧮 **Difference:** ${:+,.2f} ({:+.2f}%)
+    - {}
+    """.format(predicted_price, latest_actual_price, diff, diff_percent, accuracy_comment))
 
     st.balloons()
     return f"📈 Predicted future price for **{coin_id.capitalize()}**: **${predicted_price:,.2f}**"
